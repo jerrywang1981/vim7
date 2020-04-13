@@ -32,17 +32,19 @@ Plug 'airblade/vim-gitgutter'
 Plug 'vim-syntastic/syntastic'
 Plug 'HerringtonDarkholme/yats.vim'
 Plug 'tpope/vim-git'
-Plug 'sjl/gundo.vim'
+Plug 'scrooloose/nerdtree'
+Plug 'Konfekt/FastFold'
+Plug 'mbbill/undotree'
 Plug 'ConradIrwin/vim-bracketed-paste'
 Plug 'mattn/emmet-vim'
 Plug 'honza/vim-snippets'
 Plug 'wellle/targets.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'skywind3000/asyncrun.vim'
+Plug 'machakann/vim-highlightedyank'
 Plug 'lifepillar/vim-solarized8'
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'machakann/vim-highlightedyank'
-Plug 'vim-scripts/YankRing.vim'
 Plug 'wincent/terminus'
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/limelight.vim'
@@ -52,7 +54,6 @@ Plug 'haya14busa/incsearch-fuzzy.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'mengelbrecht/lightline-bufferline'
 Plug 'Valloric/ListToggle'
-Plug 'majutsushi/tagbar'
 Plug 'tmux-plugins/vim-tmux'
 Plug 'edkolev/tmuxline.vim'
 Plug 'tpope/vim-dispatch'
@@ -105,6 +106,15 @@ set cursorline
 set cursorcolumn
 set history=200
 
+silent !mkdir -p ~/.vim/tmp/backup
+silent !mkdir -p ~/.vim/tmp/undo
+set backupdir=~/.vim/tmp/backup,.
+set directory=~/.vim/tmp/backup,.
+if has('persistent_undo')
+	set undofile
+	set undodir=~/.vim/tmp/undo,.
+endif
+
 set t_Co=256
 
 set background=dark
@@ -112,22 +122,34 @@ colorscheme dracula
 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*/venv/*,*/node_modules/*
 
+noremap <silent> ¡ :NERDTreeToggle<CR>
+noremap <silent> <leader><leader>1 :<c-u>NERDTreeToggle<CR>
 let g:NERDSpaceDelims = 1
 let g:NERDCompactSexyComs = 1
 let g:NERDCommentEmptyLines = 1
 let g:NERDTrimTrailingWhitespace = 1
 let g:NERDToggleCheckAllLines = 1
 
+" ===
+" === vim-rooter
+" ===
+let g:rooter_patterns = ['.git/']
 let g:rooter_silent_chdir = 1
 
 " ctrl p
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
+noremap <silent> <c-m> :<c-u>CtrlPMRUFiles<CR>
+noremap <silent> <leader>b :<c-u>CtrlPBuffer<CR>
 let g:ctrlp_by_filename = 1
 let g:ctrlp_regexp = 1
 let g:ctrlp_match_window = 'bottom,order:ttb,min:1,max:10,results:10'
 let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_max_files = 10000
+let g:ctrlp_max_depth = 40
 let g:ctrlp_use_caching = 1
+let g:ctrlp_mruf_max = 250
+let g:ctrlp_mruf_exclude = '/tmp/.*\|/temp/.*' " MacOSX/Linux
 
 
 "--------------------mapping-------
@@ -160,22 +182,9 @@ map <c-k> <c-w>k
 map <c-l> <c-w>l
 map <c-h> <c-w>h
 
-let g:yankring_replace_n_pkey = '<Char-8804>'
-let g:yankring_replace_n_nkey = '<Char-8805>'
-
-" option key + 1
-nmap <silent> ¡ :Vex<CR>
-nmap <silent> <leader><leader>1 :Vex<CR>
-
-" option key + 2
-nmap <silent> ™ :TagbarToggle<CR>
-nmap <silent> <leader><leader>2 :TagbarToggle<CR>
 
 nnoremap <silent> º :Goyo<cr>
 nnoremap <silent> <leader><leader>0 :Goyo<cr>
-
-nnoremap <silent> <c-s>l :TREPLSendLine<CR>
-vnoremap <silent> <c-s>s :TREPLSendSelection<CR>
 
 
 " For conceal markers.
@@ -221,7 +230,7 @@ noremap <silent><expr> zg? incsearch#go(<SID>config_fuzzyall({'is_stay': 1}))
 
 
 "--------undo toggle---------
-noremap <silent> <leader>tr :GundoToggle<CR>
+noremap <silent> <leader><leader>5 :<c-u>UndotreeToggle<CR>
 
 
 
@@ -239,6 +248,9 @@ let g:startify_custom_header = ['']
 let g:startify_enable_special = 0
 
 
+" ===
+" === rainbow
+" ===
 let g:rainbow_active = 1
 
 " --------------------netrw----------------"
@@ -248,8 +260,6 @@ let g:netrw_browse_split = 4
 let g:netrw_altv = 1
 let g:netrw_winsize = 25
 
-"----------------------coc----------------------------"
-" source ~/.vim/config/coc.vim
 
 " auto pair
 let g:AutoPairsMapCh = 0
@@ -278,11 +288,10 @@ autocmd! User GoyoEnter Limelight
 autocmd! User GoyoLeave Limelight!
 
 " ---------tagbar-----------
-let g:tagbar_autofocus = 1
+" let g:tagbar_autofocus = 1
 
-" ----------undo tree------------
-let g:gundo_prefer_python3 = 0
-let g:gundo_help = 0
+" ----indentLine----
+let g:indentLine_fileTypeExclude=['startify', 'help']
 
 " -------lightline-----------
 
@@ -290,7 +299,7 @@ let g:lightline = {
       \ 'colorscheme': 'wombat',
       \ 'active': {
       \   'left': [ ['mode', 'paste'],
-      \             ['fugitive', 'gitgutter'],['filename', 'cocstatus', 'currentfunction']],
+      \             ['fugitive', 'gitgutter'],['filename', 'currentfunction']],
       \   'right':[ ['lineinfo'],
       \             ['percent'], ['fileformat','fileencoding', 'filetype'], []],
       \ },
@@ -314,8 +323,6 @@ let g:lightline = {
       \   'readonly': 'LightLineReadonly',
       \   'tnt': 'LightLineTnt',
       \   'modified': 'LightLineModified',
-      \   'cocstatus': 'coc#status',
-      \   'currentfunction': 'CocCurrentFunction',
       \   'filename': 'LightLineFname',
       \   'filetype': 'LightLineFiletype',
       \   'fileformat': 'LightLineFileformat',
@@ -358,34 +365,6 @@ function! LightLineFugitive()
   endif
   return ''
 endfunction
-
-function! LightLineCocError()
-  let error_sign = get(g:, 'coc_status_error_sign', has('mac') ? '❌ ' : 'E')
-  let info = get(b:, 'coc_diagnostic_info', {})
-  if empty(info)
-    return ''
-  endif
-  let errmsgs = []
-  if get(info, 'error', 0)
-    call add(errmsgs, error_sign . info['error'])
-  endif
-  return trim(join(errmsgs, ' ') . ' ' . get(g:, 'coc_status', ''))
-endfunction
-
-function! LightLineCocWarn() abort
-  let warning_sign = get(g:, 'coc_status_warning_sign')
-  let info = get(b:, 'coc_diagnostic_info', {})
-  if empty(info)
-    return ''
-  endif
-  let warnmsgs = []
-  if get(info, 'warning', 0)
-    call add(warnmsgs, warning_sign . info['warning'])
-  endif
- return trim(join(warnmsgs, ' ') . ' ' . get(g:, 'coc_status', ''))
-endfunction
-
-autocmd User CocDiagnosticChange call lightline#update()
 
 function! LightLineGitGutter()
   if ! exists('*GitGutterGetHunkSummary')
@@ -449,3 +428,52 @@ nmap <Leader>7 <Plug>lightline#bufferline#go(7)
 nmap <Leader>8 <Plug>lightline#bufferline#go(8)
 nmap <Leader>9 <Plug>lightline#bufferline#go(9)
 nmap <Leader>0 <Plug>lightline#bufferline#go(10)
+
+
+" ===
+" === Undotree
+" ===
+noremap <leader><leader>5 :UndotreeToggle<CR>
+let g:undotree_DiffAutoOpen = 1
+let g:undotree_SetFocusWhenToggle = 1
+let g:undotree_ShortIndicators = 1
+let g:undotree_WindowLayout = 2
+let g:undotree_DiffpanelHeight = 8
+let g:undotree_SplitWidth = 24
+function g:Undotree_CustomMap()
+	nmap <buffer> u <plug>UndotreeNextState
+	nmap <buffer> e <plug>UndotreePreviousState
+	nmap <buffer> U 5<plug>UndotreeNextState
+	nmap <buffer> E 5<plug>UndotreePreviousState
+endfunc
+
+
+" ===
+" === AsyncTasks
+" ===
+let g:asyncrun_open = 6
+
+" ===
+" " === fastfold
+" " ===
+" nmap zuz <Plug>(FastFoldUpdate)
+let g:fastfold_savehook = 1
+let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
+let g:fastfold_fold_movement_commands = [']z', '[z', 'ze', 'zu']
+let g:markdown_folding = 1
+let g:tex_fold_enabled = 1
+let g:vimsyn_folding = 'af'
+let g:xml_syntax_folding = 1
+let g:javaScript_fold = 1
+let g:sh_fold_enabled= 7
+let g:ruby_fold = 1
+let g:perl_fold = 1
+let g:perl_fold_blocks = 1
+let g:r_syntax_folding = 1
+let g:rust_fold = 1
+let g:php_folding = 1
+
+" yank highlight
+if !exists('##TextYankPost')
+  map y <Plug>(highlightedyank)
+endif
