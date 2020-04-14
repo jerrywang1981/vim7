@@ -41,7 +41,6 @@ Plug 'honza/vim-snippets'
 Plug 'wellle/targets.vim'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'skywind3000/asyncrun.vim'
-Plug 'machakann/vim-highlightedyank'
 Plug 'lifepillar/vim-solarized8'
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'machakann/vim-highlightedyank'
