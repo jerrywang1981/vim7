@@ -43,6 +43,7 @@ Plug 'editorconfig/editorconfig-vim'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'lifepillar/vim-solarized8'
 Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'morhetz/gruvbox'
 Plug 'machakann/vim-highlightedyank'
 Plug 'wincent/terminus'
 Plug 'junegunn/goyo.vim'
@@ -117,7 +118,8 @@ endif
 set t_Co=256
 
 set background=dark
-colorscheme dracula
+colorscheme gruvbox 
+" colorscheme dracula
 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*/venv/*,*/node_modules/*
 
@@ -300,10 +302,10 @@ let g:lightline = {
       \   'left': [ ['mode', 'paste'],
       \             ['fugitive', 'gitgutter'],['filename', 'currentfunction']],
       \   'right':[ ['lineinfo'],
-      \             ['percent'], ['fileformat','fileencoding', 'filetype'], []],
+      \             ['percent'], ['fileformat','fileencoding', 'filetype'], ['tnt']],
       \ },
       \ 'inactive': {
-      \   'left': [['mode', 'paste'], ['filename'], ['tnt']],
+      \   'left': [['mode', 'paste'], ['filename']],
       \   'right':[['lineinfo'], ['percent']],
       \ },
       \ 'tabline': {
@@ -312,6 +314,7 @@ let g:lightline = {
       \ },
       \ 'component': {
       \   'lineinfo': '%3l:%-2v',
+      \   'tnt': '%#TNTColor#%{TNT()}',
       \ },
       \ 'component_expand': {
       \   'buffers': 'lightline#bufferline#buffers',
@@ -320,7 +323,6 @@ let g:lightline = {
       \   'fugitive': 'LightLineFugitive',
       \   'gitgutter': 'LightLineGitGutter',
       \   'readonly': 'LightLineReadonly',
-      \   'tnt': 'LightLineTnt',
       \   'modified': 'LightLineModified',
       \   'filename': 'LightLineFname',
       \   'filetype': 'LightLineFiletype',
@@ -397,6 +399,17 @@ function! LightLineFilename()
         \ ('' != expand('%:t') ? expand('%:t') : '') .
         \ ('' != LightLineModified() ? ' ' . LightLineModified() : '')
 endfunction
+
+function! TNT()
+  let map = { 'V': 'n', "\<C-v>": 'n', 's': 'n', 'v': 'n', "\<C-s>": 'n', 'c': 'n', 'R': 'n'}
+  let mode = get(map, mode()[0], mode()[0])
+  let bgcolor = {'n': [240, '#585858'], 'i': [31, '#0087af']}
+  let color = get(bgcolor, mode, bgcolor.n)
+  exe printf('hi TNTColor ctermfg=200 ctermbg=%d guifg=#88ffff guibg=%s term=bold cterm=bold',
+  \ color[0], color[1])
+  return 'JERRY WANG'
+endfunction
+
 
 function! LightLineFiletype()
   return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ': 'no ft') : ''
